@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: ../ # Points to the project root directory
+      dockerfile: docker/Dockerfile # Path to the Dockerfile
+    env_file:
+      - ../.env # Path to the .env file in the project root
+    ports:
+      - "${PORT}:${PORT}" # Uses the PORT variable from the .env file
+    depends_on:
+      - db
+    volumes:
+      - ../src:/usr/src/app/src # Mounts the src directory from your host to the container
+      - /usr/src/app/node_modules # Keeps node_modules on the container
+  db:
+    image: postgres
+    env_file:
+      - ../.env # Path to the .env file in the project root
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}" # Uses the DATABASE_PORT variable from the .env file
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

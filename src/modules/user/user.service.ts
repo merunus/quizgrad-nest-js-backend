@@ -15,6 +15,7 @@ export class UserService {
 		private jwtService: JwtService
 	) {}
 
+	// Create user
 	async createUser(
 		createUserDto: CreateUserDto
 	): Promise<{ user: Omit<User, "password">; access_token: string }> {
@@ -38,14 +39,20 @@ export class UserService {
 		return { user: userWithoutPassword, access_token: token };
 	}
 
+	// Get a certain user
 	async findOne(email: string): Promise<User | undefined> {
 		return this.userRepository.findOne({ where: { email } });
 	}
 
-	async findAll(): Promise<User[]> {
-		return this.userRepository.find();
+	// Get all users
+	async findAll(): Promise<{ users: Promise<User[]>, status:string}> {
+	// async findAll(): Promise<User[]> {
+		// return this.userRepository.find() as Promise<User[]>;
+		const users = this.userRepository.find() as Promise<User[]>;
+		return { users, status: "OkiOk222i"}
 	}
 
+	// Delete certain user
 	async deleteOne(email: string): Promise<void> {
 		const user = await this.userRepository.findOne({ where: { email } });
 		if (!user) {
