@@ -1,8 +1,10 @@
 import * as bcrypt from "bcrypt";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { UserService } from "../user/user.service";
 import { AuthenticatedUser } from "../user/types";
 import { TokenService } from "../token/token.service";
+import { throwHttpException } from "src/utils/throwHttpException";
+import { RESPONSE_TYPES } from "src/models/responseTypes";
 
 @Injectable()
 export class AuthService {
@@ -13,14 +15,14 @@ export class AuthService {
 
 	async validateUser(email: string, pass: string): Promise<AuthenticatedUser | null> {
 		const user = await this.userService.findOne(email);
-		if (!user) {
-			throw new NotFoundException(`User with email ${email} not found`);
+		const isPasswordValid = user && (await bcrypt.compare(pass, user.password));
+
+		if (!user || !isPasswordValid) {
+			throwHttpException(RESPONSE_TYPES.UNAUTHORIZED, "Invalid credentials");
 		}
-		if (await bcrypt.compare(pass, user.password)) {
-			const { password, ...authenticatedUser } = user;
-			return authenticatedUser;
-		}
-		return null;
+
+		const { password, ...authenticatedUser } = user;
+		return authenticatedUser;
 	}
 
 	async login(user: AuthenticatedUser) {

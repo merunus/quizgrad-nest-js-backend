@@ -10,6 +10,8 @@ import { User } from "src/entities/user.entity";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { TokenService } from "../token/token.service";
+import { throwHttpException } from "src/utils/throwHttpException";
+import { RESPONSE_TYPES } from "src/models/responseTypes";
 
 @Injectable()
 export class UserService {
@@ -25,46 +27,40 @@ export class UserService {
 	): Promise<{ user: Omit<User, "password">; accessToken: string; refreshToken: string }> {
 		try {
 			const { username, email, password } = createUserDto;
-
 			// Check if a user already exists with the given email
 			const existingUser = await this.userRepository.findOne({ where: { email } });
 			if (existingUser) {
-				throw new ConflictException("A user with this email already exists");
+				throwHttpException(RESPONSE_TYPES.CONFLICT, "A user with this email already exists");
 			}
-
 			// Hash password
 			const hashedPassword = await bcrypt.hash(password, 10);
-
 			// Create user
 			const user = this.userRepository.create({ username, email, password: hashedPassword });
-
 			// Save user to the database
 			await this.userRepository.save(user);
-
 			// Exclude password from user object
 			const { password: _, ...userWithoutPassword } = user; // Exclude password
-
 			return {
 				user: userWithoutPassword,
 				accessToken: this.tokenService.generateAccessToken(userWithoutPassword),
 				refreshToken: this.tokenService.generateRefreshToken(userWithoutPassword)
 			};
 		} catch (error) {
+			// If custom error was triggered throw it
+			if (error.response) {
+				throw error;
+			}
 			throw new InternalServerErrorException("Failed to create user");
 		}
 	}
 
 	// Get a certain user
 	async findOne(email: string): Promise<User> {
-		try {
-			const user = await this.userRepository.findOne({ where: { email } });
-			if (!user) {
-				throw new NotFoundException(`User with email ${email} not found.`);
-			}
-			return user;
-		} catch (error) {
-			throw new InternalServerErrorException("Failed to find a user");
+		const user = await this.userRepository.findOne({ where: { email } });
+		if (!user) {
+			throwHttpException(RESPONSE_TYPES.NOT_FOUND, `User with email ${email} not found.`);
 		}
+		return user;
 	}
 
 	// Get all users
@@ -72,7 +68,7 @@ export class UserService {
 		try {
 			return await this.userRepository.find();
 		} catch (error) {
-			throw new InternalServerErrorException("Failed to find users");
+			throwHttpException(RESPONSE_TYPES.SERVER_ERROR, "Failed to find users");
 		}
 	}
 
@@ -80,9 +76,13 @@ export class UserService {
 	async deleteOne(email: string): Promise<void> {
 		const user = await this.userRepository.findOne({ where: { email } });
 		if (!user) {
-			throw new NotFoundException(`User with email ${email} not found.`);
+			throwHttpException(RESPONSE_TYPES.NOT_FOUND, `User with email ${email} not found.`);
 		}
 
-		await this.userRepository.delete({ email });
+		try {
+			await this.userRepository.delete({ email });
+		} catch (error) {
+			throwHttpException(RESPONSE_TYPES.SERVER_ERROR, "Failed to delete user");
+		}
 	}
 }

@@ -1,6 +1,8 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { JsonWebTokenError, JwtService, TokenExpiredError } from "@nestjs/jwt";
 import { AuthenticatedUser } from "../user/types";
+import { throwHttpException } from "src/utils/throwHttpException";
+import { RESPONSE_TYPES } from "src/models/responseTypes";
 
 @Injectable()
 export class TokenService {
@@ -8,20 +10,20 @@ export class TokenService {
 
 	private handleRefreshTokenError(error: Error) {
 		if (error instanceof TokenExpiredError) {
-			throw new UnauthorizedException("Refresh token expired");
+			throwHttpException(RESPONSE_TYPES.UNAUTHORIZED, "Refresh token expired");
 		} else if (error instanceof JsonWebTokenError) {
-			throw new UnauthorizedException("Invalid refresh token");
+			throwHttpException(RESPONSE_TYPES.UNAUTHORIZED, "Invalid refresh token");
 		}
-		throw new InternalServerErrorException("Failed to verify refresh token");
+		throwHttpException(RESPONSE_TYPES.SERVER_ERROR, "Failed to verify refresh token");
 	}
 
 	generateAccessToken(user: AuthenticatedUser) {
-		const payload = { username: user.username, sub: user.id };
+		const payload = { sub: user.id };
 		return this.jwtService.sign(payload);
 	}
 
 	generateRefreshToken(user: AuthenticatedUser) {
-		const payload = { username: user.username, sub: user.id };
+		const payload = { sub: user.id };
 		return this.jwtService.sign(payload, {
 			secret: process.env.JWT_REFRESH_SECRET,
 			expiresIn: process.env.REFRESH_TOKEN_EXPIRE
