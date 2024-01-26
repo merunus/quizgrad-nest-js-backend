@@ -12,6 +12,8 @@ import * as bcrypt from "bcrypt";
 import { TokenService } from "../token/token.service";
 import { throwHttpException } from "src/utils/throwHttpException";
 import { RESPONSE_TYPES } from "src/models/responseTypes";
+import * as fs from "fs";
+import * as path from "path";
 
 @Injectable()
 export class UserService {
@@ -84,5 +86,36 @@ export class UserService {
 		} catch (error) {
 			throwHttpException(RESPONSE_TYPES.SERVER_ERROR, "Failed to delete user");
 		}
+	}
+
+	async updateUserAvatar(userId: number, filePath: string) {
+		const user = await this.userRepository.findOne({ where: { id: userId } });
+		if (!user) {
+			throwHttpException(RESPONSE_TYPES.NOT_FOUND, `User with ID ${userId} not found`);
+		}
+
+		user.avatarUrl = filePath;
+		await this.userRepository.save(user); // Save the updated user to the database
+
+		return {
+			statusCode: RESPONSE_TYPES.OK,
+			message: "User avatar successfully updated"
+		};
+	}
+
+	async getUserAvatar(userId: number): Promise<{ filePath: string | null }> {
+		const user = await this.userRepository.findOne({ where: { id: userId } });
+		console.log("user", user);
+		if (!user || !user.avatarUrl) {
+			throwHttpException(RESPONSE_TYPES.NOT_FOUND, "Avatar was not found");
+		}
+
+		const filePath = path.resolve(user.avatarUrl);
+		// check if the avatar file exists on the server
+		if (!fs.existsSync(filePath)) {
+			return { filePath: null };
+		}
+
+		return { filePath };
 	}
 }

@@ -19,4 +19,8 @@ export class User {
 	// Relationship with Set
 	@OneToMany(() => Set, (set) => set.user)
 	sets: Set[];
+
+	// Avatar image
+	@Column({ nullable: true })
+	avatarUrl: string;
 }

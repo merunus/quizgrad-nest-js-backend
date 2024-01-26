@@ -12,10 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, EStrategies.JWT) {
 			ignoreExpiration: false,
 			secretOrKey: `${process.env.JWT_SECRET}`
 		});
-		
 	}
-
-
 
 	async validate(payload: JwtPayload) {
 		return { userId: payload.sub };

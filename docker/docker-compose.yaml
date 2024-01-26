@@ -2,29 +2,31 @@ version: "3.8"
 services:
   app:
     build:
-      context: ../ # Points to the project root directory
-      dockerfile: docker/Dockerfile # Path to the Dockerfile
+      context: ../
+      dockerfile: docker/Dockerfile
     env_file:
-      - ../.env # Path to the .env file in the project root
+      - ../.env
     ports:
-      - "${PORT}:${PORT}" # Uses the PORT variable from the .env file
+      - "${PORT}:${PORT}"
     depends_on:
       - db
     volumes:
-      - ../src:/usr/src/app/src # Mounts the src directory from your host to the container
-      - /usr/src/app/node_modules # Keeps node_modules on the container
+      - ../src:/usr/src/app/src
+      - /usr/src/app/node_modules
+      - avatars_volume:/usr/src/app/avatars # Here we create a named volume for avatars
   db:
     image: postgres
     env_file:
-      - ../.env # Path to the .env file in the project root
+      - ../.env
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - "${DATABASE_PORT}:${DATABASE_PORT}" # Uses the DATABASE_PORT variable from the .env file
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
+  avatars_volume: # This declares the volume within the Docker compose file
