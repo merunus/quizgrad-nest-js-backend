@@ -28,17 +28,20 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
+	@UseGuards(JwtAuthGuard)
 	async createUser(@Body() createUserDto: CreateUserDto) {
 		return this.userService.createUser(createUserDto);
 	}
 
 	@Delete(":email")
+	@UseGuards(JwtAuthGuard)
 	async deleteUser(@Param("email") userEmail: string) {
 		await this.userService.deleteOne(userEmail);
 		return { message: `User with email ${userEmail} successfully deleted.` };
 	}
 
 	@Get()
+	@UseGuards(JwtAuthGuard)
 	async findAllUsers() {
 		return this.userService.findAll();
 	}
