@@ -4,8 +4,8 @@ import { Set } from "./set.entity";
 @Entity()
 export class User {
 	// This decorator is used to define the primary key of the table, which will be auto-generated (usually an incrementing ID).
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn("uuid")
+	id: string;
 
 	@Column()
 	email: string;

@@ -16,7 +16,7 @@ import { UserService } from "./user.service";
 import { CreateUserDto } from "src/dto/create-user.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/guards/jwt-auth.guard";
-import { MulterExceptionFilter, multerConfig } from "src/utils/userVatarMulterConfig";
+import { MulterExceptionFilter, multerConfig } from "src/utils/multerImageUploadConfig";
 import { throwHttpException } from "src/utils/throwHttpException";
 import { RESPONSE_TYPES } from "src/models/responseTypes";
 import * as path from "path";

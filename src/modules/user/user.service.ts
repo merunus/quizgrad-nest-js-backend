@@ -88,7 +88,7 @@ export class UserService {
 		}
 	}
 
-	async updateUserAvatar(userId: number, filePath: string) {
+	async updateUserAvatar(userId: string, filePath: string) {
 		const user = await this.userRepository.findOne({ where: { id: userId } });
 		if (!user) {
 			throwHttpException(RESPONSE_TYPES.NOT_FOUND, `User with ID ${userId} not found`);
@@ -103,9 +103,8 @@ export class UserService {
 		};
 	}
 
-	async getUserAvatar(userId: number): Promise<{ filePath: string | null }> {
+	async getUserAvatar(userId: string): Promise<{ filePath: string | null }> {
 		const user = await this.userRepository.findOne({ where: { id: userId } });
-		console.log("user", user);
 		if (!user || !user.avatarUrl) {
 			throwHttpException(RESPONSE_TYPES.NOT_FOUND, "Avatar was not found");
 		}
