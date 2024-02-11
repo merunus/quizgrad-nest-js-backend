@@ -10,4 +10,7 @@ export class Word {
 
 	@Column()
 	translate: string;
+
+	@Column({ nullable: true })
+	imageUrl?: string; 
 }

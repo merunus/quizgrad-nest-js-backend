@@ -7,9 +7,18 @@ import { UserModule } from "../user/user.module";
 import { AuthModule } from "../auth/auth.module";
 import { SetModule } from "../set/set.module";
 import { WordModule } from "../word/word.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
 
 @Module({
 	imports: [
+		ServeStaticModule.forRoot({
+			rootPath: "/avatars", // Directly use the absolute path
+			serveRoot: "/avatars/"
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: "/wordsImages", // Directly use the absolute path
+			serveRoot: "/wordsImages/"
+		}),
 		ConfigModule.forRoot({
 			isGlobal: true
 		}),

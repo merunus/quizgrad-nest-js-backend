@@ -1,14 +1,14 @@
-import { IsString, IsArray, MinLength, ArrayMinSize, ValidateNested } from "class-validator";
+import { IsString, IsArray, MinLength, ArrayMinSize, ValidateNested, IsNotEmpty } from "class-validator";
 import { CreateWordDto } from "./create-word-dto";
 import { Type } from "class-transformer";
 
 export class CreateSetDto {
 	@IsString()
-	@MinLength(2, { message: "Name must be at least 2    character long" })
+	@IsNotEmpty()
 	name: string;
 
 	@IsString()
-	@MinLength(2, { message: "Language must be at least 2    character long" })
+	@IsNotEmpty()
 	language: string;
 
 	@IsArray()

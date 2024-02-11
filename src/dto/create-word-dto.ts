@@ -1,9 +1,14 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateWordDto {
-    @IsString()
-    word: string;
+	@IsString()
+	@IsNotEmpty()
+	word: string;
 
-    @IsString()
-    translate: string;
+	@IsString()
+	@IsNotEmpty()
+	translate: string;
+
+	@IsOptional()
+	imageUrl?: string;
 }

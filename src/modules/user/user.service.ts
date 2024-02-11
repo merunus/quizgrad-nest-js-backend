@@ -1,19 +1,16 @@
-import {
-	ConflictException,
-	Injectable,
-	InternalServerErrorException,
-	NotFoundException
-} from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateUserDto } from "src/dto/create-user.dto";
 import { User } from "src/entities/user.entity";
 import { Repository } from "typeorm";
-import * as bcrypt from "bcrypt";
 import { TokenService } from "../token/token.service";
 import { throwHttpException } from "src/utils/throwHttpException";
 import { RESPONSE_TYPES } from "src/models/responseTypes";
+import * as bcrypt from "bcrypt";
 import * as fs from "fs";
 import * as path from "path";
+import * as mime from "mime";
+import { avatarsPath } from "src/constants/core.constants";
 
 @Injectable()
 export class UserService {
@@ -88,7 +85,8 @@ export class UserService {
 		}
 	}
 
-	async updateUserAvatar(userId: string, filePath: string) {
+	async updateUserAvatar(userId: string, file: Express.Multer.File) {
+		const filePath = `${avatarsPath}/${file.filename}`;
 		const user = await this.userRepository.findOne({ where: { id: userId } });
 		if (!user) {
 			throwHttpException(RESPONSE_TYPES.NOT_FOUND, `User with ID ${userId} not found`);
@@ -103,18 +101,24 @@ export class UserService {
 		};
 	}
 
-	async getUserAvatar(userId: string): Promise<{ filePath: string | null }> {
+	async getUserAvatar(userId: string): Promise<{ file: string | null; mimetype: string | null }> {
 		const user = await this.userRepository.findOne({ where: { id: userId } });
-		if (!user || !user.avatarUrl) {
-			throwHttpException(RESPONSE_TYPES.NOT_FOUND, "Avatar was not found");
-		}
+		if (!user) throwHttpException(RESPONSE_TYPES.NOT_FOUND, `Failed to find user `);
+		if (!user.avatarUrl) throwHttpException(RESPONSE_TYPES.NOT_FOUND, "Failed to find user avatar");
 
 		const filePath = path.resolve(user.avatarUrl);
 		// check if the avatar file exists on the server
-		if (!fs.existsSync(filePath)) {
-			return { filePath: null };
+		if (!fs.existsSync(filePath) || !filePath) {
+			throwHttpException(RESPONSE_TYPES.NOT_FOUND, "Failed to find user avatar");
 		}
 
-		return { filePath };
+		const file = path.resolve(filePath);
+		const mimetype = mime.lookup(file);
+
+		if (mimetype && file) {
+			return { mimetype, file };
+		} else {
+			throwHttpException(RESPONSE_TYPES.SERVER_ERROR, "Could not determine file type");
+		}
 	}
 }

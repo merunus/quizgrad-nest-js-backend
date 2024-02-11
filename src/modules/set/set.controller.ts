@@ -1,8 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+	Req,
+	UploadedFiles,
+	UseGuards,
+	UseInterceptors
+} from "@nestjs/common";
 import { SetService } from "./set.service";
 import { JwtAuthGuard } from "src/guards/jwt-auth.guard";
-import { CreateSetDto } from "src/dto/create-set-dto";
-import { UpdateSetDto } from "src/dto/update-set-dto";
+import { FileFieldsInterceptor } from "@nestjs/platform-express";
+import { multerWordsImagesUploadConfig } from "src/utils/multer/multerWordsImagesUploadConfig";
 
 @Controller("set")
 export class SetController {
@@ -23,15 +35,24 @@ export class SetController {
 
 	@Post()
 	@UseGuards(JwtAuthGuard)
-	async createUserSet(@Req() req, @Body() createSetDto: CreateSetDto) {
+	@UseInterceptors(FileFieldsInterceptor([{ name: "wordsImages" }], multerWordsImagesUploadConfig))
+	async createUserSet(
+		@UploadedFiles() files: { wordsImages?: Express.Multer.File[] },
+		@Body("createSetDto") createSetDtoString: string,
+		@Req() req
+	) {
 		const userId = req.user.userId;
-		return this.setService.handleCreateUserSet(userId, createSetDto);
+		return this.setService.handleCreateUserSet(userId, createSetDtoString, files);
 	}
 
 	@Put()
 	@UseGuards(JwtAuthGuard)
-	async updateUserSet(@Body() updateSetDto: UpdateSetDto) {
-		return this.setService.handleUpdateUserSet(updateSetDto);
+	@UseInterceptors(FileFieldsInterceptor([{ name: "wordsImages" }], multerWordsImagesUploadConfig))
+	async updateUserSet(
+		@UploadedFiles() files: { wordsImages?: Express.Multer.File[] },
+		@Body("updateSetDto") updateSetDtoString: string
+	) {
+		return this.setService.handleUpdateUserSet(updateSetDtoString, files);
 	}
 
 	@Delete("/delete-all")

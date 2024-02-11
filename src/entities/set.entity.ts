@@ -23,7 +23,7 @@ export class Set {
 
 	// Relationship with User
 	// Indicates that each set belongs to one user
-	@ManyToOne(() => User, (user) => user.sets)
+	@ManyToOne(() => User, (user) => user.sets, { onDelete: "CASCADE" }) // When a user who created set deleted - delete set
 	user: User;
 
 	// Relationship with Word

@@ -13,7 +13,9 @@ services:
     volumes:
       - ../src:/usr/src/app/src
       - /usr/src/app/node_modules
-      - avatars_volume:/usr/src/app/avatars # Here we create a named volume for avatars
+      - avatars_volume:/avatars # Here we create a named volume for avatars
+      - wordsImages_volume:/wordsImages # Here we create a named volume for avatars
+
   db:
     image: postgres
     env_file:
@@ -30,3 +32,4 @@ services:
 volumes:
   postgres_data:
   avatars_volume: # This declares the volume within the Docker compose file
+  wordsImages_volume: # This declares the volume within the Docker compose file
