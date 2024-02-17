@@ -2,13 +2,13 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinTable,
-	ManyToMany,
 	ManyToOne,
+	OneToMany,
 	PrimaryGeneratedColumn
 } from "typeorm";
 import { User } from "./user.entity";
 import { Word } from "./word.entity";
+import { Quiz } from "./quiz.entity";
 
 @Entity()
 export class Set {
@@ -27,11 +27,13 @@ export class Set {
 	user: User;
 
 	// Relationship with Word
-	// Indicates that set can contain many words
-	@ManyToMany(() => Word)
-	@JoinTable() // This decorator is required for the owner side of a many-to-many relation
+	@OneToMany(() => Word, (word) => word.set, { cascade: true })
 	words: Word[];
 
 	@CreateDateColumn()
 	createdAt: Date;
+
+	// One set can be associated with many quizzes
+	@OneToMany(() => Quiz, (quiz) => quiz.set, { cascade: true })
+	quizzes: Quiz[];
 }

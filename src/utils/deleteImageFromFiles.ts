@@ -8,6 +8,6 @@ export const deleteImageFromFiles = async (imageUrl: string) => {
 			console.error(`Failed to delete image at ${imageUrl}:`, error);
 		}
 	} else {
-		console.log(`${imageUrl} does not exist on path ${imageUrl}`);
+		console.error(`${imageUrl} does not exist on path ${imageUrl}`);
 	}
 };

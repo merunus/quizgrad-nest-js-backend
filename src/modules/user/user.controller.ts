@@ -41,6 +41,13 @@ export class UserController {
 		return this.userService.findAll();
 	}
 
+	@Get(":userEmail")
+	@UseGuards(JwtAuthGuard)
+	async findUser(@Param("userEmail") userEmail:string) {
+		return this.userService.findUser(userEmail);
+	}
+
+
 	@Post("/avatar")
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor("avatar", multerUserAvatarImageUploadConfig)) //  intercept a file from the incoming request where the file is sent under the key 'file'

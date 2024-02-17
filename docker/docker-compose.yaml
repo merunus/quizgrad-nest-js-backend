@@ -26,8 +26,21 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
+    expose:
+      - "${DATABASE_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: nest-pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PG_ADMIN_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PG_ADMIN_PASSWORD}"
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

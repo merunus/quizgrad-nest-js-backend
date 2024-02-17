@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from "typeorm";
 import { Set } from "./set.entity";
+import { Quiz } from "./quiz.entity";
 
 @Entity()
 export class User {
@@ -23,4 +24,11 @@ export class User {
 	// Avatar image
 	@Column({ nullable: true })
 	avatarUrl: string;
+
+	@CreateDateColumn()
+	createdAt: Date;
+
+	// One user can take many quizzes.
+	@OneToMany(() => Quiz, (quiz) => quiz.user)
+	quizzes: Quiz[];
 }
