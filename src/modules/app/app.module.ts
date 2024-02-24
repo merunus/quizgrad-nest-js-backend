@@ -11,6 +11,10 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { QuizModule } from "../quiz/quiz.module";
 import { QuizQuestionModule } from "../quiz-question/quiz-question.module";
 import { typeOrmConfig } from "src/typeorm/typeormConfig";
+import { ExamModule } from "../exam/exam.module";
+import { WritingQuestionModule } from "../writing-question/writing-question.module";
+import { TrueFalseQuestionModule } from "../true-false-question/true-false-question.module";
+import { MatchingQuestionModule } from "../matching-question/matching-question.module";
 
 @Module({
 	imports: [
@@ -31,7 +35,11 @@ import { typeOrmConfig } from "src/typeorm/typeormConfig";
 		SetModule,
 		WordModule,
 		QuizModule,
-		QuizQuestionModule
+		QuizQuestionModule,
+		ExamModule,
+		WritingQuestionModule,
+		TrueFalseQuestionModule,
+		MatchingQuestionModule
 	],
 	controllers: [AppController],
 	providers: [AppService]

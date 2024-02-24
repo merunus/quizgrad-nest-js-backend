@@ -33,4 +33,5 @@ export class Quiz {
 	// Quiz can have many quiz questions
 	@OneToMany(() => QuizQuestion, (question) => question.quiz, { cascade: true})
 	questions: QuizQuestion[];
+
 }

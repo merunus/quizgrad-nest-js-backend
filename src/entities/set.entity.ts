@@ -9,6 +9,7 @@ import {
 import { User } from "./user.entity";
 import { Word } from "./word.entity";
 import { Quiz } from "./quiz.entity";
+import { Exam } from "./exam.entity";
 
 @Entity()
 export class Set {
@@ -36,4 +37,7 @@ export class Set {
 	// One set can be associated with many quizzes
 	@OneToMany(() => Quiz, (quiz) => quiz.set, { cascade: true })
 	quizzes: Quiz[];
+
+	@OneToMany(() => Exam, (exam) => exam.set, { cascade: true })
+	exams: Exam[];
 }
